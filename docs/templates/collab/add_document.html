@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Document | {% endblock %}
+
+{% block content %}
+<div class="p-10 lg:p-20 text-center">
+    <h1 class="text-3xl lg:text-6xl text-white">Create a New Document</h1>
+</div>
+<div class="flex justify-center mt-10">
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="px-5 py-3 rounded-xl text-white bg-teal-600 hover:bg-teal-700">Create
+            Document</button>
+    </form>
+</div>
+{% endblock %}

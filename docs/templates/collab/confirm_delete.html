@@ -1,0 +1,16 @@
+<!-- collab/confirm_delete.html -->
+{% extends 'base.html' %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<div class="p-10 lg:p-20">
+    <h1 class="text-3xl lg:text-6xl text-white">Are you sure you want to delete "{{ document.name }}"?</h1>
+    <form method="post" action="{% url 'delete_document' document.slug %}">
+        {% csrf_token %}
+        <button type="submit" class="px-5 py-3 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+        <a href="{% url 'documents_list' %}"
+            class="px-5 py-3 bg-gray-600 text-white rounded hover:bg-gray-700">Cancel</a>
+    </form>
+</div>
+{% endblock %}
