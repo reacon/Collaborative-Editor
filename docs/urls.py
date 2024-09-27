@@ -6,5 +6,6 @@ urlpatterns = [
     path('add',views.add_document,name='add_document'),
     path('<slug:slug>', views.document_view, name='document_view'),
     path('<slug:slug>/delete', views.delete_document, name='delete_document'),
+    path('documents/<slug:slug>/manage_permissions/', views.manage_permissions, name='manage_permissions'),
 
 ]

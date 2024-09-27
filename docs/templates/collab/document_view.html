@@ -3,35 +3,23 @@
 {% block title %}Edit Document | {{ document.name }}{% endblock %}
 
 {% block content %}
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <div class="p-10 lg:p-20">
     <h1 class="text-3xl lg:text-6xl text-white">Edit Document</h1>
 
-    <input type="text" id="document-name" value="{{ document.name }}" placeholder="Document Name">
-    <textarea id="document-content">{{ document.content }}</textarea>
+    <input type="text" id="document-name" value="{{ document.name }}" placeholder="Document Name" {% if not can_edit %} disabled {% endif %}>
+    <textarea id="document-content" name="content" {% if not can_edit %} disabled {% endif %}>{{ document.content }}</textarea>
+
     <a href="{% url 'delete_document' document.slug %}"
         class="px-5 py-3 bg-red-600 text-white rounded hover:bg-red-700">Delete Document</a>
 </div>
-<!-- {% if user.username == document.creator.username %}
-<button id="show-users-btn">Manage Users</button>
-<div id="users-list" style="display: none;">
-    {% for permission in document.permissions.all %}
-    <div class="user-permission">
-        <p>{{ permission.user.username }}</p>
-        <label>
-            Edit Permission:
-            <input type="checkbox" class="edit-permission-toggle" data-user-id="{{ permission.user.id }}" {% if
-                permission.edit_permission %} checked {% endif %}>
-        </label>
-        <label>
-            Delete Permission:
-            <input type="checkbox" class="delete-permission-toggle" data-user-id="{{ permission.user.id }}" {% if
-                permission.delete_permission %} checked {% endif %}>
-        </label>
-    </div>
-    {% endfor %}
-</div>
-{% endif %} -->
+{% if request.user == document.creator %}
+<a href="{% url 'manage_permissions' document.slug %}">
+    <button>Manage Permissions</button>
+</a>
+{% endif %}
 
 {% endblock %}
 {% block scripts %}
@@ -57,7 +45,7 @@
     //         })
     //     })
     // })
-   
+
 </script>
 {{ document.slug|json_script:"json-slug" }}
 {{ request.user.username|json_script:"json-username" }}
@@ -65,30 +53,30 @@
     const documentSlug = JSON.parse(document.getElementById('json-slug').textContent);
     const userName = JSON.parse(document.getElementById('json-username').textContent);
 
-    const documentSocket = new WebSocket('ws://'+ window.location.host + '/ws/'+ documentSlug + '/');
+    const documentSocket = new WebSocket('ws://' + window.location.host + '/ws/' + documentSlug + '/');
 
     documentSocket.onopen = function () {
-            console.log("WebSocket connection opened");
-        };
-    documentSocket.onclose = function(e){
+        console.log("WebSocket connection opened");
+    };
+    documentSocket.onclose = function (e) {
         console.log('websocket closed');
     }
 
-    documentSocket.onmessage = function(e){
+    documentSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        if (data.document_content || data.document_name){
+        if (data.document_content || data.document_name) {
             document.querySelector('#document-content').value = data.document_content;
             document.querySelector('#document-name').value = data.document_name;
 
 
         }
     }
-   function sendUpdate() {
+    function sendUpdate() {
         const name = document.querySelector('#document-name').value;
         const content = document.querySelector('#document-content').value;
         if (documentSocket.readyState === WebSocket.OPEN) {
             documentSocket.send(JSON.stringify({
-                'document_name' : name,
+                'document_name': name,
                 'document_content': content,  // Ensure this key matches the consumer's expected key
                 'user': userName,
             }));
@@ -100,8 +88,8 @@
     document.querySelector('#document-content').addEventListener('input', function () {
         sendUpdate();
     });
-     document.querySelector('#document-name').addEventListener('input', function () {
-            sendUpdate();
-        });
+    document.querySelector('#document-name').addEventListener('input', function () {
+        sendUpdate();
+    });
 </script>
 {% endblock %}
